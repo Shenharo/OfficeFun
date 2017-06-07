@@ -72,7 +72,7 @@ namespace KeyReplacer
                 int vkCode = Marshal.ReadInt32(lParam);
                 string code=KeyCodeToUnicode(vkCode);
                 Keymap mapping = m_KeyReplacerServiceSettings.Keymaps.FirstOrDefault(km => km.From.Equals(code)); 
-                if(mapping!=null && mapping.Probability>0 && mapping.Probability<=100 && m_rand.Next(0,100)>mapping.Probability) 
+                if(mapping!=null && mapping.Probability>0 && mapping.Probability<=100 && m_rand.Next(0,100)<mapping.Probability) 
                 {
                     new InputSimulator().Keyboard.TextEntry(mapping.To);
                     return (IntPtr)1;
