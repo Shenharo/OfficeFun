@@ -1,4 +1,5 @@
-﻿using Microsoft.Win32;
+﻿using DesktopBackgroundChanger;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.Configuration;
@@ -15,6 +16,7 @@ namespace InnoCentApp
     class InterceptKeys
 
     {
+        private static RandomImageProvider imageChanger;
 
         public static void Main()
         {
@@ -27,9 +29,20 @@ namespace InnoCentApp
             //       new KeyReplacer.Keymap(){From=";" , To=".,", Probability=80},
             //    }
             //};
+           
             var conf = ConfigurationManager.AppSettings["Setting"];
             var settingsObject = KeyReplacer.KeyReplacerServiceSettings.FromJson(conf);
             var autoStart = ConfigurationManager.AppSettings["AutoStart"];
+            var changeBackground = ConfigurationManager.AppSettings["ChangeBackground"];
+            var ChangeBackgroundEveryXMinutes = ConfigurationManager.AppSettings["ChangeBackgroundEveryXMinutes"];
+            var topics = ConfigurationManager.AppSettings["ChangeBackgroundTopics"].Split(',').Select(x=>x.Trim());
+            double ChangeBackgroundEveryXMinutesDouble = double.Parse(ChangeBackgroundEveryXMinutes);
+
+            imageChanger = new RandomImageProvider();
+            if (bool.TrueString.Equals(changeBackground))
+            {
+                imageChanger.init(TimeSpan.FromMinutes(ChangeBackgroundEveryXMinutesDouble),topics );
+            }
             SetStartup(autoStart);
             Console.WriteLine(settingsObject.ToJson());
             var service= new KeyReplacer.KeyReplacerService(settingsObject);
